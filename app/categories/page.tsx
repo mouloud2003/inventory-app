@@ -113,7 +113,7 @@ export default async function CategoriesPage(props: {
               <p className="text-sm text-gray-600 mt-3">
                 Showing results for:{" "}
                 <span className="font-semibold text-gray-900">
-                  "{searchQuery}"
+                  &quot;{searchQuery}&quot;
                 </span>
               </p>
             )}
