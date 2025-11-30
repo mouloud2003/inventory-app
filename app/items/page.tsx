@@ -2,6 +2,7 @@
 
 import { prisma } from "../lib/prisma"; // لو عندك alias استخدم "@/lib/prisma"
 import Link from "next/link";
+import { Prisma } from "@prisma/client";
 
 type SearchParams = {
   q?: string;
@@ -15,14 +16,16 @@ export default async function ItemsPage(props: {
   const searchQuery = searchParams.q?.trim() || "";
 
   // 2) نبني شرط البحث
-  const where = searchQuery
-    ? {
-        name: {
-          contains: searchQuery,
-          mode: "insensitive", // بحث غير حساس لحالة الأحرف
-        },
-      }
-    : {};
+  const where =
+    searchQuery !== ""
+      ? {
+          name: {
+            contains: searchQuery,
+            // نقول لتيبسكربت: هذه القيمة بالضبط من نوع QueryMode
+            mode: "insensitive" as const,
+          },
+        }
+      : undefined;
 
   // 3) نجلب العناصر مع تطبيق شرط where (لو searchQuery فارغ → يرجع كل العناصر)
   const items = await prisma.item.findMany({
@@ -134,7 +137,7 @@ export default async function ItemsPage(props: {
               <p className="text-sm text-emerald-700 mt-3">
                 Showing results for:{" "}
                 <span className="font-semibold text-emerald-900">
-                  "{searchQuery}"
+                  &quot;{searchQuery}&quot;
                 </span>
               </p>
             )}
@@ -220,7 +223,7 @@ export default async function ItemsPage(props: {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-900">
-                        ${parseFloat(item.price).toFixed(2)}
+                        ${Number(item.price).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span
