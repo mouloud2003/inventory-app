@@ -21,8 +21,6 @@ export default async function ItemsPage(props: {
       ? {
           name: {
             contains: searchQuery,
-            // نقول لتيبسكربت: هذه القيمة بالضبط من نوع QueryMode
-            mode: "insensitive" as const,
           },
         }
       : undefined;

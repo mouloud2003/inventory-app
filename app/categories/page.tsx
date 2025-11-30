@@ -19,7 +19,6 @@ export default async function CategoriesPage(props: {
     ? {
         name: {
           contains: searchQuery,
-          mode: "insensitive" as const, // بحث غير حساس لحالة الأحرف
         },
       }
     : {};
