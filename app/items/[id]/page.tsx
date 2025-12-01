@@ -1,6 +1,7 @@
 // app/items/[id]/page.tsx
 
 import { prisma } from "@/app/lib/prisma";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 type Params = {
@@ -98,12 +99,12 @@ export default async function ItemDetailsPage(props: {
 
         {/* Actions */}
         <div className="flex gap-3">
-          <a
+          <Link
             href="/items"
             className="flex-1 text-center border border-gray-300 text-gray-700 px-4 py-3 rounded hover:bg-gray-50 transition-colors"
           >
             Back to List
-          </a>
+          </Link>
           <form action={deleteItem} className="flex-1">
             <input type="hidden" name="id" value={item.id} />
             <button
