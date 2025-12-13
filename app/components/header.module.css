@@ -1,0 +1,66 @@
+.header {
+    background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+    padding: 0.7rem 2rem;
+    box-shadow: 0 4px 16px rgba(38, 50, 56, 0.1);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 0.7rem 1rem;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+.title {
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin: 0;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 8px rgba(38, 50, 56, 0.12);
+  cursor: pointer;
+  transition: transform 0.2s, text-shadow 0.2s;
+}
+.navbtn {
+  background: #fff;
+  color: #43e97b;
+  padding: 0.7rem 1.3rem;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  box-shadow: 0 2px 8px rgba(38, 50, 56, 0.1);
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  margin-left: 1rem;
+}
+.linkelement {
+  text-decoration: none;
+}
+.navlinks {
+  display: flex;
+  gap: 1rem;
+}
+.title:hover {
+  transform: translateY(-2px);
+  text-shadow: 0 4px 16px rgba(38, 50, 56, 0.18);
+}
+
+.navbtn:hover {
+  box-shadow: 0 4px 16px rgba(38, 50, 56, 0.18);
+  transform: translateY(-2px) scale(1.05);
+}
