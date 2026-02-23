@@ -1,6 +1,7 @@
 import { prisma } from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ItemShape } from "@/app/lib/types";
 import PageHeader from "@/app/components/page-header";
 import Breadcrumbs from "@/app/components/breadcrumbs";
 import BadgeStock from "@/app/components/badge-stock";
@@ -31,8 +32,6 @@ export default async function CategoryItemsPage(props: {
   if (!category) {
     notFound();
   }
-
-  type ItemShape = { id: number; name: string; description: string | null; price: number; stock: number; categoryId: number };
 
   const totalStock = (category.items as ItemShape[]).reduce((s, i) => s + i.stock, 0);
   const totalValue = (category.items as ItemShape[]).reduce((s, i) => s + Number(i.price) * i.stock, 0);

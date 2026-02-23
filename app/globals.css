@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
-/* ─── Class-based dark mode for next-themes ─── */
+/* ─── Class-based dark mode for next-themes ─────────────────────────────────
+   Enables the dark: Tailwind prefix when a `.dark` class is present on <html>.
+   next-themes adds/removes `.dark` based on the selected theme.
+─────────────────────────────────────────────────────────────────────────── */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ─── Design Tokens ─── */

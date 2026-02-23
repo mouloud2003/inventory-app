@@ -2,18 +2,11 @@
 
 import { prisma } from "../lib/prisma";
 import Link from "next/link";
+import type { ItemShape } from "../lib/types";
 import PageHeader from "../components/page-header";
 import BadgeStock from "../components/badge-stock";
 import EmptyState from "../components/empty-state";
 import { PlusCircle, Search, X, Package } from "lucide-react";
-
-type ItemShape = {
-  id: number;
-  name: string;
-  price: number;
-  stock: number;
-  category: { id: number; name: string } | null;
-};
 
 type SearchParams = {
   q?: string;

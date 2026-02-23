@@ -83,23 +83,12 @@ export default function Sidebar() {
               key={href}
               href={href}
               title={collapsed ? label : undefined}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-              style={{
-                color: active
-                  ? "var(--sidebar-text-active)"
-                  : "var(--sidebar-text)",
-                background: active ? "var(--sidebar-active)" : "transparent",
-              }}
-              onMouseEnter={(e) => {
-                if (!active)
-                  (e.currentTarget as HTMLElement).style.background =
-                    "var(--sidebar-hover)";
-              }}
-              onMouseLeave={(e) => {
-                if (!active)
-                  (e.currentTarget as HTMLElement).style.background =
-                    "transparent";
-              }}
+              className={[
+                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                active
+                  ? "bg-[var(--sidebar-active)] text-[var(--sidebar-text-active)]"
+                  : "text-[var(--sidebar-text)] hover:bg-white/[.08]",
+              ].join(" ")}
             >
               <Icon size={16} className="shrink-0" />
               {!collapsed && <span className="truncate">{label}</span>}
@@ -117,15 +106,7 @@ export default function Sidebar() {
             key={href}
             href={href}
             title={collapsed ? label : undefined}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-            style={{ color: "var(--sidebar-text)" }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.background =
-                "var(--sidebar-hover)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.background = "transparent";
-            }}
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors text-[var(--sidebar-text)] hover:bg-white/[.08]"
           >
             <Icon size={16} className="shrink-0" />
             {!collapsed && <span className="truncate">{label}</span>}

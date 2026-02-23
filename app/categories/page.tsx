@@ -2,11 +2,10 @@
 
 import { prisma } from "../lib/prisma";
 import Link from "next/link";
+import type { CategoryWithCount } from "../lib/types";
 import PageHeader from "../components/page-header";
 import EmptyState from "../components/empty-state";
 import { Tags, Search, X, Package, ChevronRight } from "lucide-react";
-
-type CatShape = { id: number; name: string; description: string | null; _count: { items: number } };
 
 type SearchParams = {
   q?: string;
@@ -113,7 +112,7 @@ export default async function CategoriesPage(props: {
         />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {(categories as CatShape[]).map((cat) => (
+          {(categories as CategoryWithCount[]).map((cat) => (
             <Link
               key={cat.id}
               href={`/categories/${cat.id}`}

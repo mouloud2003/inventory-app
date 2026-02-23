@@ -2,12 +2,11 @@
 
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
+import type { CategoryShape } from "@/app/lib/types";
 import PageHeader from "@/app/components/page-header";
 import Breadcrumbs from "@/app/components/breadcrumbs";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-
-type CatShape = { id: number; name: string };
 
 type SearchParams = {
   categoryId?: string;
@@ -208,7 +207,7 @@ export default async function NewItemPage(props: {
               <option value="" disabled style={{ color: "var(--text-subtle)" }}>
                 Select a category…
               </option>
-              {(categories as CatShape[]).map((cat) => (
+              {(categories as CategoryShape[]).map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>

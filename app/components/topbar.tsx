@@ -18,8 +18,8 @@ export default function Topbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(id);
+    const id = setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(id);
   }, []);
 
   const themes = [

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/app/lib/prisma";
+import type { ItemShape } from "@/app/lib/types";
 import PageHeader from "./components/page-header";
 import StatCard from "./components/stat-card";
 import ChartCard from "./components/chart-card";
@@ -47,8 +48,6 @@ const barData = (categoriesWithItems as CatWithItems[])
 const pieData = (categoriesWithItems as CatWithItems[])
   .map((c) => ({ name: c.name, value: c.items.length }))
   .filter((c) => c.value > 0);
-
-type LowStockItem = { id: number; name: string; stock: number; category: { name: string } | null };
 
 const lowStockItems = await prisma.item.findMany({
   where: { stock: { lte: 5 } },
@@ -168,7 +167,7 @@ export default function HomePage() {
           />
         ) : (
           <ul className="divide-y" style={{ borderColor: "var(--border)" }}>
-            {(lowStockItems as LowStockItem[]).map((item) => (
+            {(lowStockItems as ItemShape[]).map((item) => (
               <li
                 key={item.id}
                 className="flex items-center justify-between px-5 py-3 hover:bg-[var(--surface-raised)] transition-colors"
