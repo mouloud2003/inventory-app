@@ -23,10 +23,10 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
       <PieChart>
         <Pie
           data={data}
-          cx="50%"
+          cx="40%"
           cy="50%"
           innerRadius={55}
-          outerRadius={85}
+          outerRadius={80}
           paddingAngle={3}
           dataKey="value"
         >
@@ -44,7 +44,16 @@ export default function CategoryPieChart({ data }: CategoryPieChartProps) {
           }}
         />
         <Legend
-          wrapperStyle={{ fontSize: "11px", color: "var(--text-muted)" }}
+          layout="vertical"
+          verticalAlign="middle"
+          align="right"
+          formatter={(value: string) =>
+            value.length > 12 ? value.slice(0, 12) + "…" : value
+          }
+          wrapperStyle={{
+            fontSize: "11px",
+            color: "var(--text-muted)",
+          }}
           iconType="circle"
           iconSize={8}
         />
