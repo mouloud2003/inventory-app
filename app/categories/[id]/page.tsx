@@ -1,8 +1,15 @@
 import { prisma } from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { ItemShape } from "@/app/lib/types";
+import PageHeader from "@/app/components/page-header";
+import Breadcrumbs from "@/app/components/breadcrumbs";
+import BadgeStock from "@/app/components/badge-stock";
+import EmptyState from "@/app/components/empty-state";
+import ChartCard from "@/app/components/chart-card";
+import CategoryBarChart from "@/app/components/category-bar-chart";
+import { ArrowLeft, Package, DollarSign, Archive, PlusCircle } from "lucide-react";
 
-// هذا هو الشكل الصحيح للـ params
 type Params = {
   id: string;
 };
@@ -10,13 +17,10 @@ type Params = {
 export default async function CategoryItemsPage(props: {
   params: Promise<Params>;
 }) {
-  // نفك الـ Promise ونأخذ id مباشرة
   const { id } = await props.params;
-
   const categoryId = Number(id);
 
   if (Number.isNaN(categoryId)) {
-    // هنا أفضل نستعمل notFound بدل JSX عادي
     notFound();
   }
 
@@ -29,95 +33,193 @@ export default async function CategoryItemsPage(props: {
     notFound();
   }
 
+  const totalStock = (category.items as ItemShape[]).reduce((s, i) => s + i.stock, 0);
+  const totalValue = (category.items as ItemShape[]).reduce((s, i) => s + Number(i.price) * i.stock, 0);
+
+  const chartData = (category.items as ItemShape[])
+    .map((i) => ({
+      name: i.name.length > 10 ? i.name.slice(0, 10) + "…" : i.name,
+      stock: i.stock,
+      value: Number(i.price) * i.stock,
+    }))
+    .sort((a, b) => b.stock - a.stock)
+    .slice(0, 8);
+
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-200">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-3">
-                {category.name}
-              </h1>
-              <p className="text-gray-600 text-lg">
-                {category.description || "No description provided."}
-              </p>
-            </div>
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
-              {category.items.length} items
-            </div>
+    <div className="space-y-6">
+      <PageHeader
+        title={category.name}
+        description={category.description || "Category details and associated items."}
+        breadcrumb={
+          <Breadcrumbs
+            items={[
+              { label: "Categories", href: "/categories" },
+              { label: category.name },
+            ]}
+          />
+        }
+        actions={
+          <div className="flex items-center gap-2">
+            <Link
+              href="/categories"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+              style={{
+                background: "var(--surface-raised)",
+                border: "1px solid var(--border)",
+                color: "var(--text-muted)",
+              }}
+            >
+              <ArrowLeft size={14} /> Back
+            </Link>
+            <Link
+              href={`/items/new?categoryId=${category.id}`}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium"
+              style={{ background: "var(--primary)", color: "var(--primary-fg)" }}
+            >
+              <PlusCircle size={14} /> Add Item
+            </Link>
           </div>
+        }
+      />
+
+      {/* Summary + Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Stats */}
+        <div
+          className="rounded-xl p-5 flex flex-col gap-4"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            boxShadow: "var(--shadow-sm)",
+          }}
+        >
+          <h3 className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+            Category Summary
+          </h3>
+          {[
+            { icon: Package, label: "Items", value: category.items.length },
+            { icon: Archive, label: "Total Stock", value: totalStock.toLocaleString() + " units" },
+            {
+              icon: DollarSign,
+              label: "Total Value",
+              value: `$${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+            },
+          ].map(({ icon: Icon, label, value }) => (
+            <div key={label} className="flex items-center gap-3">
+              <div
+                className="rounded-lg p-2 shrink-0"
+                style={{ background: "var(--primary-subtle)", color: "var(--primary)" }}
+              >
+                <Icon size={14} />
+              </div>
+              <div>
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>{label}</p>
+                <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{value}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Items Grid */}
-        {category.items.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-200">
-            <div className="text-gray-400 mb-4">
-              <svg
-                className="w-16 h-16 mx-auto"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
+        {/* Chart */}
+        <ChartCard
+          title="Stock per Item"
+          description="Top items by stock quantity"
+          className="lg:col-span-2"
+        >
+          {chartData.length > 0 ? (
+            <CategoryBarChart data={chartData} />
+          ) : (
+            <div className="h-[180px] flex items-center justify-center text-sm" style={{ color: "var(--text-muted)" }}>
+              No items to chart
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No items found
-            </h3>
-            <p className="text-gray-500">
-              There are no items in this category yet.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {category.items.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200 group"
-              >
-                <h3 className="font-semibold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors">
-                  {item.name}
-                </h3>
-
-                {item.description && (
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                    {item.description}
-                  </p>
-                )}
-
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                  {/* لو price عندك Number في Prisma ما تحتاج parseFloat */}
-                  {item.price !== undefined && (
-                    <span className="text-green-600 font-semibold">
-                      ${Number(item.price).toFixed(2)}
-                    </span>
-                  )}
-
-                  {item.stock !== undefined && (
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        item.stock > 10
-                          ? "bg-green-100 text-green-800"
-                          : item.stock > 0
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
-                      {item.stock} in stock
-                    </span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+          )}
+        </ChartCard>
       </div>
-    </main>
+
+      {/* Items */}
+      {category.items.length === 0 ? (
+        <EmptyState
+          title="No items in this category"
+          description="Add your first item to this category to get started."
+          icon={<Package size={28} />}
+          action={
+            <Link
+              href={`/items/new?categoryId=${category.id}`}
+              className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium"
+              style={{ background: "var(--primary)", color: "var(--primary-fg)" }}
+            >
+              <PlusCircle size={15} /> Add Item
+            </Link>
+          }
+        />
+      ) : (
+        <div
+          className="rounded-xl overflow-hidden"
+          style={{
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            boxShadow: "var(--shadow-sm)",
+          }}
+        >
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr
+                  style={{
+                    borderBottom: "1px solid var(--border)",
+                    background: "var(--surface-raised)",
+                  }}
+                >
+                  {["Name", "Description", "Price", "Stock"].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {(category.items as ItemShape[]).map((item, idx) => (
+                  <tr
+                    key={item.id}
+                    style={{
+                      background:
+                        idx % 2 === 1 ? "var(--surface-raised)" : "var(--surface)",
+                      borderBottom: "1px solid var(--border)",
+                    }}
+                    className="transition-colors hover:bg-[var(--primary-subtle)]"
+                  >
+                    <td className="px-4 py-3 font-medium" style={{ color: "var(--text)" }}>
+                      <Link
+                        href={`/items/${item.id}`}
+                        className="hover:underline"
+                        style={{ color: "var(--primary)" }}
+                      >
+                        {item.name}
+                      </Link>
+                    </td>
+                    <td
+                      className="px-4 py-3 text-xs max-w-xs truncate"
+                      style={{ color: "var(--text-muted)" }}
+                    >
+                      {item.description || "—"}
+                    </td>
+                    <td className="px-4 py-3 font-semibold" style={{ color: "var(--text)" }}>
+                      ${Number(item.price).toFixed(2)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <BadgeStock stock={item.stock} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
