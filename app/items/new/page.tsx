@@ -2,6 +2,12 @@
 
 import { prisma } from "@/app/lib/prisma";
 import { redirect } from "next/navigation";
+import PageHeader from "@/app/components/page-header";
+import Breadcrumbs from "@/app/components/breadcrumbs";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+
+type CatShape = { id: number; name: string };
 
 type SearchParams = {
   categoryId?: string;
@@ -52,113 +58,185 @@ export default async function NewItemPage(props: {
     ? Number(searchParams.categoryId)
     : undefined;
 
+  const inputStyle = {
+    background: "var(--surface-raised)",
+    border: "1px solid var(--border)",
+    borderRadius: "var(--radius)",
+    color: "var(--text)",
+    padding: "0.625rem 0.875rem",
+    fontSize: "0.875rem",
+    width: "100%",
+    outline: "none",
+    transition: "border-color 0.15s",
+  } as React.CSSProperties;
+
+  const labelStyle = {
+    display: "block",
+    fontSize: "0.8125rem",
+    fontWeight: 500,
+    color: "var(--text-muted)",
+    marginBottom: "0.375rem",
+  } as React.CSSProperties;
+
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Create New Item</h1>
-          <p className="text-gray-600 mt-2">Add a new item to your inventory</p>
-        </div>
+    <div className="max-w-2xl">
+      <PageHeader
+        title="Add New Item"
+        description="Fill in the details below to register a new inventory item."
+        breadcrumb={
+          <Breadcrumbs
+            items={[
+              { label: "Items", href: "/items" },
+              { label: "New Item" },
+            ]}
+          />
+        }
+        actions={
+          <Link
+            href="/items"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+            style={{
+              background: "var(--surface-raised)",
+              border: "1px solid var(--border)",
+              color: "var(--text-muted)",
+            }}
+          >
+            <ArrowLeft size={14} /> Back
+          </Link>
+        }
+      />
 
-        {/* Form Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <form action={createItem} className="space-y-6">
-            {/* Name Field */}
+      <div
+        className="rounded-xl p-6"
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow-sm)",
+        }}
+      >
+        <form action={createItem} className="space-y-5">
+          {/* Name */}
+          <div>
+            <label style={labelStyle} htmlFor="name">
+              Item Name <span style={{ color: "var(--destructive)" }}>*</span>
+            </label>
+            <input
+              id="name"
+              name="name"
+              style={inputStyle}
+              placeholder="e.g. Wireless Keyboard"
+              required
+              autoFocus
+            />
+            <p className="mt-1 text-xs" style={{ color: "var(--text-subtle)" }}>
+              A clear, descriptive name for this item.
+            </p>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label style={labelStyle} htmlFor="description">
+              Description
+            </label>
+            <textarea
+              id="description"
+              name="description"
+              rows={3}
+              style={{ ...inputStyle, resize: "none" }}
+              placeholder="Optional: brief description of the item…"
+            />
+          </div>
+
+          {/* Price & Stock */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Item Name
+              <label style={labelStyle} htmlFor="price">
+                Price <span style={{ color: "var(--destructive)" }}>*</span>
               </label>
-              <input
-                name="name"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="Enter item name"
-                required
-              />
-            </div>
-
-            {/* Description Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                placeholder="Enter item description (optional)"
-              />
-            </div>
-
-            {/* Price and Stock Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Price Field */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-3 text-gray-500">$</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="price"
-                    className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="0.00"
-                    required
-                    aria-label="price"
-                  />
-                </div>
-              </div>
-
-              {/* Stock Field */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Stock Quantity
-                </label>
+              <div className="relative">
+                <span
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-medium"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  $
+                </span>
                 <input
+                  id="price"
                   type="number"
-                  name="stock"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  defaultValue={0}
-                  aria-label="stock"
+                  step="0.01"
+                  min="0"
+                  name="price"
+                  style={{ ...inputStyle, paddingLeft: "1.75rem" }}
+                  placeholder="0.00"
+                  required
+                  aria-label="price"
                 />
               </div>
             </div>
-
-            {/* Category Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
+              <label style={labelStyle} htmlFor="stock">
+                Stock Quantity
               </label>
-              <select
-                name="categoryId"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
-                defaultValue={preselectedCategoryId ?? ""}
-                required
-                aria-label="category"
-              >
-                <option value="" disabled className="text-gray-400">
-                  Select a category
-                </option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id} className="text-gray-900">
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+              <input
+                id="stock"
+                type="number"
+                min="0"
+                name="stock"
+                style={inputStyle}
+                defaultValue={0}
+                aria-label="stock"
+              />
+              <p className="mt-1 text-xs" style={{ color: "var(--text-subtle)" }}>
+                Leave at 0 if not yet in stock.
+              </p>
             </div>
+          </div>
 
-            {/* Submit Button */}
+          {/* Category */}
+          <div>
+            <label style={labelStyle} htmlFor="categoryId">
+              Category <span style={{ color: "var(--destructive)" }}>*</span>
+            </label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              style={{ ...inputStyle, cursor: "pointer" }}
+              defaultValue={preselectedCategoryId ?? ""}
+              required
+              aria-label="category"
+            >
+              <option value="" disabled style={{ color: "var(--text-subtle)" }}>
+                Select a category…
+              </option>
+              {(categories as CatShape[]).map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            {categories.length === 0 && (
+              <p className="mt-1.5 text-xs" style={{ color: "var(--warning)" }}>
+                No categories found.{" "}
+                <Link href="/categories" style={{ color: "var(--primary)", textDecoration: "underline" }}>
+                  Create one first
+                </Link>
+                .
+              </p>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: "1rem" }}>
             <button
               type="submit"
-              className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              className="w-full rounded-lg py-2.5 text-sm font-semibold transition-colors"
+              style={{ background: "var(--primary)", color: "var(--primary-fg)" }}
             >
               Create Item
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
-    </main>
+    </div>
   );
 }

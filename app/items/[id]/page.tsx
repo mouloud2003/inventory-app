@@ -3,6 +3,10 @@
 import { prisma } from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import PageHeader from "@/app/components/page-header";
+import Breadcrumbs from "@/app/components/breadcrumbs";
+import BadgeStock from "@/app/components/badge-stock";
+import { ArrowLeft, Trash2, Package, Tag, DollarSign, Archive } from "lucide-react";
 
 type Params = {
   id: string;
@@ -46,76 +50,131 @@ export default async function ItemDetailsPage(props: {
     notFound();
   }
 
+  const fields = [
+    {
+      icon: Tag,
+      label: "Category",
+      value: item.category ? (
+        <Link
+          href={`/categories/${item.category.id}`}
+          className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium hover:opacity-80 transition-opacity"
+          style={{ background: "var(--primary-subtle)", color: "var(--primary)" }}
+        >
+          {item.category.name}
+        </Link>
+      ) : (
+        <span className="text-sm italic" style={{ color: "var(--text-subtle)" }}>No category</span>
+      ),
+    },
+    {
+      icon: DollarSign,
+      label: "Price",
+      value: (
+        <span className="text-xl font-bold" style={{ color: "var(--primary)" }}>
+          ${Number(item.price).toFixed(2)}
+        </span>
+      ),
+    },
+    {
+      icon: Archive,
+      label: "Stock",
+      value: <BadgeStock stock={item.stock} />,
+    },
+    {
+      icon: Package,
+      label: "Item ID",
+      value: <span className="font-mono text-sm">#{item.id}</span>,
+    },
+  ];
+
   return (
-    <main className="min-h-screen bg-white py-8">
-      <div className="max-w-2xl mx-auto px-4">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{item.name}</h1>
-          <p className="text-gray-500">Item Details</p>
-        </div>
-
-        {/* Details List */}
-        <div className="space-y-6 mb-8">
-          <div className="border-b pb-4">
-            <label className="text-sm font-medium text-gray-500">
-              Description
-            </label>
-            <p className="text-gray-800 mt-1">
-              {item.description || "No description"}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6">
-            <div className="border-b pb-4">
-              <label className="text-sm font-medium text-gray-500">
-                Category
-              </label>
-              <p className="text-gray-800 mt-1">{item.category?.name || "—"}</p>
-            </div>
-
-            <div className="border-b pb-4">
-              <label className="text-sm font-medium text-gray-500">ID</label>
-              <p className="text-gray-800 mt-1">#{item.id}</p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6">
-            <div className="border-b pb-4">
-              <label className="text-sm font-medium text-gray-500">Price</label>
-              <p className="text-xl font-semibold text-blue-600 mt-1">
-                ${item.price}
-              </p>
-            </div>
-
-            <div className="border-b pb-4">
-              <label className="text-sm font-medium text-gray-500">Stock</label>
-              <p className="text-xl font-semibold text-gray-800 mt-1">
-                {item.stock}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3">
+    <div className="max-w-2xl">
+      <PageHeader
+        title={item.name}
+        description="Item details and management options."
+        breadcrumb={
+          <Breadcrumbs
+            items={[
+              { label: "Items", href: "/items" },
+              { label: item.name },
+            ]}
+          />
+        }
+        actions={
           <Link
             href="/items"
-            className="flex-1 text-center border border-gray-300 text-gray-700 px-4 py-3 rounded hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+            style={{
+              background: "var(--surface-raised)",
+              border: "1px solid var(--border)",
+              color: "var(--text-muted)",
+            }}
           >
-            Back to List
+            <ArrowLeft size={14} /> Back
           </Link>
-          <form action={deleteItem} className="flex-1">
-            <input type="hidden" name="id" value={item.id} />
-            <button
-              type="submit"
-              className="w-full bg-red-500 text-white px-4 py-3 rounded hover:bg-red-600 transition-colors"
+        }
+      />
+
+      {/* Details card */}
+      <div
+        className="rounded-xl overflow-hidden mb-4"
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          boxShadow: "var(--shadow-sm)",
+        }}
+      >
+        {/* Description */}
+        <div
+          className="px-6 py-4 border-b"
+          style={{ borderColor: "var(--border)" }}
+        >
+          <p className="text-xs font-medium uppercase tracking-wider mb-1" style={{ color: "var(--text-subtle)" }}>
+            Description
+          </p>
+          <p className="text-sm" style={{ color: item.description ? "var(--text)" : "var(--text-subtle)" }}>
+            {item.description || "No description provided."}
+          </p>
+        </div>
+
+        {/* Fields grid */}
+        <div className="grid grid-cols-2">
+          {fields.map(({ icon: Icon, label, value }, i) => (
+            <div
+              key={label}
+              className="px-6 py-4 flex flex-col gap-2"
+              style={{
+                borderBottom: i < 2 ? `1px solid var(--border)` : undefined,
+                borderRight: i % 2 === 0 ? `1px solid var(--border)` : undefined,
+              }}
             >
-              Delete
-            </button>
-          </form>
+              <div className="flex items-center gap-1.5">
+                <Icon size={13} style={{ color: "var(--text-subtle)" }} />
+                <span className="text-xs font-medium uppercase tracking-wider" style={{ color: "var(--text-subtle)" }}>
+                  {label}
+                </span>
+              </div>
+              <div>{value}</div>
+            </div>
+          ))}
         </div>
       </div>
-    </main>
+
+      {/* Actions */}
+      <form action={deleteItem}>
+        <input type="hidden" name="id" value={item.id} />
+        <button
+          type="submit"
+          className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+          style={{
+            background: "var(--destructive-subtle)",
+            color: "var(--destructive)",
+            border: "1px solid var(--destructive)",
+          }}
+        >
+          <Trash2 size={14} /> Delete Item
+        </button>
+      </form>
+    </div>
   );
 }
