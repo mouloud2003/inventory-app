@@ -1,8 +1,7 @@
 // app/items/page.tsx
 
-import { prisma } from "../lib/prisma"; // لو عندك alias استخدم "@/lib/prisma"
+import { prisma } from "../lib/prisma";
 import Link from "next/link";
-import { Prisma } from "@prisma/client";
 
 type SearchParams = {
   q?: string;
@@ -11,11 +10,9 @@ type SearchParams = {
 export default async function ItemsPage(props: {
   searchParams: Promise<SearchParams>;
 }) {
-  // 1) نقرأ searchParams من ال URL (مثلاً /items?q=phone)
   const searchParams = await props.searchParams;
   const searchQuery = searchParams.q?.trim() || "";
 
-  // 2) نبني شرط البحث
   const where =
     searchQuery !== ""
       ? {
@@ -25,7 +22,6 @@ export default async function ItemsPage(props: {
         }
       : undefined;
 
-  // 3) نجلب العناصر مع تطبيق شرط where (لو searchQuery فارغ → يرجع كل العناصر)
   const items = await prisma.item.findMany({
     where,
     orderBy: { id: "asc" },
@@ -35,21 +31,21 @@ export default async function ItemsPage(props: {
   });
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 py-8">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 py-8">
       <div className="max-w-7xl mx-auto px-4">
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-emerald-900">All Items</h1>
-              <p className="text-emerald-700 mt-2">
+              <h1 className="text-3xl font-bold text-slate-900">All Items</h1>
+              <p className="text-slate-500 mt-1">
                 Manage your inventory items
               </p>
             </div>
             <div className="flex gap-3">
               <Link
                 href="/"
-                className="inline-flex items-center gap-2 text-emerald-700 border border-emerald-300 px-4 py-2 rounded-lg bg-white hover:bg-emerald-50 transition-colors font-medium"
+                className="inline-flex items-center gap-2 text-slate-600 border border-slate-200 px-4 py-2 rounded-lg bg-white hover:bg-slate-50 transition-colors font-medium text-sm"
               >
                 <svg
                   className="w-4 h-4"
@@ -68,7 +64,7 @@ export default async function ItemsPage(props: {
               </Link>
               <Link
                 href="/items/new"
-                className="inline-flex items-center gap-2 text-white bg-emerald-600 px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium shadow-sm"
+                className="inline-flex items-center gap-2 text-white bg-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm shadow-sm shadow-indigo-200"
               >
                 <svg
                   className="w-4 h-4"
@@ -89,12 +85,12 @@ export default async function ItemsPage(props: {
           </div>
 
           {/* Search Section */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-emerald-100">
+          <div className="bg-white rounded-xl shadow-sm p-5 border border-slate-200/80">
             <form className="flex gap-3">
               <div className="flex-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg
-                    className="h-4 w-4 text-emerald-400"
+                    className="h-4 w-4 text-slate-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -112,19 +108,19 @@ export default async function ItemsPage(props: {
                   name="q"
                   placeholder="Search items by name..."
                   defaultValue={searchQuery}
-                  className="w-full pl-10 pr-4 py-3 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
                 />
               </div>
               <button
                 type="submit"
-                className="bg-emerald-600 text-white px-6 py-3 rounded-lg hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors font-medium"
+                className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors font-medium text-sm"
               >
                 Search
               </button>
               {searchQuery && (
                 <Link
                   href="/items"
-                  className="border border-emerald-300 px-6 py-3 rounded-lg bg-white hover:bg-emerald-50 transition-colors font-medium text-emerald-700"
+                  className="border border-slate-200 px-5 py-2.5 rounded-lg bg-white hover:bg-slate-50 transition-colors font-medium text-slate-600 text-sm"
                 >
                   Clear
                 </Link>
@@ -132,9 +128,9 @@ export default async function ItemsPage(props: {
             </form>
 
             {searchQuery && (
-              <p className="text-sm text-emerald-700 mt-3">
+              <p className="text-sm text-slate-500 mt-3">
                 Showing results for:{" "}
-                <span className="font-semibold text-emerald-900">
+                <span className="font-semibold text-slate-900">
                   &quot;{searchQuery}&quot;
                 </span>
               </p>
@@ -144,8 +140,8 @@ export default async function ItemsPage(props: {
 
         {/* Items Table */}
         {items.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-emerald-100">
-            <div className="text-emerald-400 mb-4">
+          <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-slate-200/80">
+            <div className="text-slate-300 mb-4">
               <svg
                 className="w-16 h-16 mx-auto"
                 fill="none"
@@ -160,77 +156,75 @@ export default async function ItemsPage(props: {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-emerald-900 mb-2">
+            <h3 className="text-lg font-medium text-slate-900 mb-2">
               No items found
             </h3>
-            <p className="text-emerald-600">
+            <p className="text-slate-500">
               {searchQuery
                 ? "Try adjusting your search terms"
                 : "Get started by creating your first item"}
             </p>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-emerald-100 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-emerald-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-emerald-900 uppercase tracking-wider">
+                <thead>
+                  <tr className="border-b border-slate-100">
+                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       ID
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-emerald-900 uppercase tracking-wider">
+                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Name
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-emerald-900 uppercase tracking-wider">
+                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Category
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-emerald-900 uppercase tracking-wider">
+                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Price
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-emerald-900 uppercase tracking-wider">
+                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Stock
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-emerald-900 uppercase tracking-wider">
+                    <th className="px-6 py-3.5 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-emerald-100">
-                  {items.map((item, idx) => (
+                <tbody className="divide-y divide-slate-100">
+                  {items.map((item) => (
                     <tr
                       key={item.id}
-                      className={`hover:bg-emerald-50 transition-colors ${
-                        idx % 2 === 0 ? "bg-white" : "bg-emerald-25"
-                      }`}
+                      className="hover:bg-slate-50/50 transition-colors"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-900 font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 font-mono">
                         #{item.id}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-emerald-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                         {item.name}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {item.category ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700">
                             {item.category.name}
                           </span>
                         ) : (
-                          <span className="text-emerald-500 italic">
+                          <span className="text-slate-400 italic text-xs">
                             No Category
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">
                         ${Number(item.price).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             item.stock > 10
-                              ? "bg-green-100 text-green-800"
+                              ? "bg-emerald-50 text-emerald-700"
                               : item.stock > 0
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
+                              ? "bg-amber-50 text-amber-700"
+                              : "bg-red-50 text-red-700"
                           }`}
                         >
                           {item.stock} in stock
@@ -239,9 +233,9 @@ export default async function ItemsPage(props: {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <Link
                           href={`/items/${item.id}`}
-                          className="text-emerald-600 hover:text-emerald-900 transition-colors font-medium"
+                          className="text-indigo-600 hover:text-indigo-900 transition-colors font-medium text-sm"
                         >
-                          View Details
+                          View Details →
                         </Link>
                       </td>
                     </tr>
