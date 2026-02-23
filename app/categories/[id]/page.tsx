@@ -2,7 +2,6 @@ import { prisma } from "@/app/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// هذا هو الشكل الصحيح للـ params
 type Params = {
   id: string;
 };
@@ -10,13 +9,11 @@ type Params = {
 export default async function CategoryItemsPage(props: {
   params: Promise<Params>;
 }) {
-  // نفك الـ Promise ونأخذ id مباشرة
   const { id } = await props.params;
 
   const categoryId = Number(id);
 
   if (Number.isNaN(categoryId)) {
-    // هنا أفضل نستعمل notFound بدل JSX عادي
     notFound();
   }
 
@@ -30,90 +27,91 @@ export default async function CategoryItemsPage(props: {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header Section */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-8 border border-gray-200">
+    <main className="min-h-screen bg-slate-50 py-10">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Breadcrumb */}
+        <nav className="mb-6 flex items-center gap-2 text-sm text-slate-500">
+          <Link href="/categories" className="hover:text-indigo-600 transition-colors">
+            Categories
+          </Link>
+          <span>/</span>
+          <span className="text-slate-800 font-medium">{category.name}</span>
+        </nav>
+
+        {/* Category Header */}
+        <div className="bg-white rounded-xl shadow-sm ring-1 ring-slate-200/60 p-6 mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-3">
+              <h1 className="text-xl font-bold text-slate-900 mb-1">
                 {category.name}
               </h1>
-              <p className="text-gray-600 text-lg">
+              <p className="text-sm text-slate-500">
                 {category.description || "No description provided."}
               </p>
             </div>
-            <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
+            <span className="inline-flex items-center px-3 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 ring-1 ring-indigo-200/50">
               {category.items.length} items
-            </div>
+            </span>
           </div>
         </div>
 
         {/* Items Grid */}
         {category.items.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-200">
-            <div className="text-gray-400 mb-4">
-              <svg
-                className="w-16 h-16 mx-auto"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <div className="bg-white rounded-xl shadow-sm p-12 text-center ring-1 ring-slate-200/60">
+            <div className="text-slate-300 mb-4 text-5xl">📦</div>
+            <h3 className="text-base font-semibold text-slate-800 mb-1">
               No items found
             </h3>
-            <p className="text-gray-500">
+            <p className="text-sm text-slate-500">
               There are no items in this category yet.
             </p>
+            <Link
+              href={`/items/new?categoryId=${category.id}`}
+              className="inline-flex items-center gap-1.5 mt-4 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors"
+            >
+              + Add an item
+            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {category.items.map((item) => (
-              <div
+              <Link
                 key={item.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200 group"
+                href={`/items/${item.id}`}
+                className="group bg-white rounded-xl shadow-sm ring-1 ring-slate-200/60 p-5 hover:shadow-md hover:ring-indigo-200 transition-all"
               >
-                <h3 className="font-semibold text-gray-900 text-lg mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-semibold text-slate-900 text-sm mb-1 group-hover:text-indigo-600 transition-colors">
                   {item.name}
                 </h3>
 
                 {item.description && (
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                  <p className="text-slate-500 text-xs mb-3 line-clamp-2">
                     {item.description}
                   </p>
                 )}
 
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                  {/* لو price عندك Number في Prisma ما تحتاج parseFloat */}
+                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
                   {item.price !== undefined && (
-                    <span className="text-green-600 font-semibold">
+                    <span className="text-sm font-bold text-indigo-600">
                       ${Number(item.price).toFixed(2)}
                     </span>
                   )}
 
                   {item.stock !== undefined && (
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${
+                      className={`text-xs px-2 py-0.5 rounded-md font-medium ${
                         item.stock > 10
-                          ? "bg-green-100 text-green-800"
+                          ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/50"
                           : item.stock > 0
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
+                          ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200/50"
+                          : "bg-red-50 text-red-700 ring-1 ring-red-200/50"
                       }`}
                     >
                       {item.stock} in stock
                     </span>
                   )}
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
