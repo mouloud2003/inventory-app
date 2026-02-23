@@ -7,7 +7,7 @@ export default function Header() {
   return (
     <header className={style.header}>
       <Link href="/" className={style.linkelement}>
-        <h1 className={style.title}>📦 Inventory</h1>
+        <h1 className={style.title}><span aria-hidden="true">📦</span> Inventory</h1>
       </Link>
 
       <nav className={style.navlinks}>
